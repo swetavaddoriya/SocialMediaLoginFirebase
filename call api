@@ -1,0 +1,194 @@
+  public void callApi() {
+        showDialog();
+
+        SignUpRequest request = new SignUpRequest();
+        request.setAPIKey(Constants.APIKEY);
+        request.setCustomerFirstName(returnText(edFirstName));
+        request.setCustomerLastName(returnText(edLastName));
+        request.setLoginEmailID(returnText(edEmail));
+        request.setLoginPassword(returnText(edPassword));
+        request.setContactNo(returnText(edContactNumber));
+        request.setCompanyName(returnText(edCompanyName));
+        request.setBusinessType(returnText(txtBusinessType));
+        request.setCountry(returnText(txtLocation));
+
+        requestAPI.Register(request).enqueue(ResponseCallback);
+    }
+
+    private Callback<CommonResponse> ResponseCallback = new Callback<CommonResponse>() {
+        @Override
+        public void onResponse(Call<CommonResponse> call, Response<CommonResponse> response) {
+            dismissDialog();
+            Toast.makeText(getActivity(), "" + response.body().getReturnMsg(), Toast.LENGTH_SHORT).show();
+
+            if (response.body().getReturnCode().equalsIgnoreCase("1")) {
+                finish();
+            }
+        }
+
+        @Override
+        public void onFailure(Call<CommonResponse> call, Throwable t) {
+            t.printStackTrace();
+            dismissDialog();
+        }
+
+    };
+
+    public void callApiForMaster() {
+        showDialog();
+        MasterRequest request = new MasterRequest();
+        request.setAPIKey(Constants.APIKEY);
+
+        requestAPI.Master(request).enqueue(MasterCallback);
+    }
+
+    private Callback<MasterResponse> MasterCallback = new Callback<MasterResponse>() {
+        @Override
+        public void onResponse(Call<MasterResponse> call, Response<MasterResponse> response) {
+            dismissDialog();
+            MasterResponse masterResponse = response.body();
+            if (response.body().getReturnCode().equalsIgnoreCase("1")) {
+                arrayCountry.clear();
+                arrayBusiness.clear();
+                arrayCountry.addAll(masterResponse.getData().getCountryList());
+                arrayBusiness.addAll(masterResponse.getData().getBusinessTypeList());
+            }
+
+        }
+
+        @Override
+        public void onFailure(Call<MasterResponse> call, Throwable t) {
+            t.printStackTrace();
+            dismissDialog();
+        }
+
+    };
+    
+    
+    ==================================================validation======================================
+    
+        private boolean validate() {
+        boolean isValidation = true;
+
+        String strEmail = returnText(edEmail);
+        String strPassword = returnText(edPassword);
+
+        if (strEmail.isEmpty()) {
+            isValidation = false;
+            Toast.makeText(getActivity(), "" + getString(R.string.err_empty_email), Toast.LENGTH_SHORT).show();
+        } else if (!Patterns.EMAIL_ADDRESS.matcher(strEmail).matches()) {
+            isValidation = false;
+            Toast.makeText(getActivity(), "" + getString(R.string.err_valid_email), Toast.LENGTH_SHORT).show();
+        } else if (strPassword.isEmpty()) {
+            isValidation = false;
+            Toast.makeText(getActivity(), "" + getString(R.string.err_empty_pass), Toast.LENGTH_SHORT).show();
+        }
+
+        return isValidation;
+    }
+    ==========================================================recyclerview.eventlistner==================
+    
+     public void selectField(boolean isLocation) {
+
+        View v = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_categories_list, null);
+        ImageView imgClose = v.findViewById(R.id.imgClose);
+
+        RecyclerView rvCategories = v.findViewById(R.id.rvCategories);
+        TextView txtTitle = v.findViewById(R.id.txtTitle);
+        final EditText edSearch = v.findViewById(R.id.edSearch);
+
+        final AlertDialog dialog = new AlertDialog.Builder(getActivity())
+                .setView(v)
+                .create();
+        dialog.setCancelable(false);
+
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+        rvCategories.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        if (isLocation) {
+            txtTitle.setText(getResources().getString(R.string.text_select_location));
+            edSearch.setHint(getResources().getString(R.string.text_search_location));
+            final LocationListFilterAdapter categoriesAdapter = new LocationListFilterAdapter(getActivity());
+            rvCategories.setAdapter(categoriesAdapter);
+            categoriesAdapter.addAll(arrayCountry);
+
+            categoriesAdapter.setEventListener(new LocationListFilterAdapter.EventListener() {
+                @Override
+                public void onClick(MasterResponse.CountryList data) {
+                    hideKeyboard();
+                    txtLocation.setText(data.getName());
+                    dialog.dismiss();
+                }
+            });
+
+
+            imgClose.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dialog.dismiss();
+                }
+            });
+
+            edSearch.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    categoriesAdapter.getFilter().filter(returnText(edSearch));
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+
+                }
+
+            });
+
+        } else {
+
+            txtTitle.setText(getResources().getString(R.string.text_select_business_type));
+            edSearch.setHint(getResources().getString(R.string.text_search_business_type));
+            final BusinessListFilterAdapter businessListAdapter = new BusinessListFilterAdapter(getActivity());
+            rvCategories.setAdapter(businessListAdapter);
+            businessListAdapter.addAll(arrayBusiness);
+
+            businessListAdapter.setEventListener(new BusinessListFilterAdapter.EventListener() {
+                @Override
+                public void onClick(MasterResponse.BusinessTypeList data) {
+                    hideKeyboard();
+                    txtBusinessType.setText(data.getName());
+                    dialog.dismiss();
+                }
+            });
+
+            imgClose.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dialog.dismiss();
+                }
+            });
+
+            edSearch.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    businessListAdapter.getFilter().filter(returnText(edSearch));
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+
+                }
+
+            });
+        }
+        dialog.show();
+    }
