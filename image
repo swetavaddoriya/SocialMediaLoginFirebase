@@ -1,0 +1,11 @@
+ RequestOptions options = new RequestOptions();
+        options.placeholder(R.drawable.placeholder);
+        options.error(R.drawable.placeholder);
+
+        Glide.with(context)
+                .applyDefaultRequestOptions(options)
+                .load(data.get(position).getStone_Img_url()).into(holder.imgDiamond);
+                ========================
+                
+                api 'com.github.bumptech.glide:glide:4.7.1'
+                 implementation 'com.squareup.picasso:picasso:2.5.2'
