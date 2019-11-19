@@ -1,0 +1,174 @@
+package com.oozeetech.gdpapplication.adapter;
+
+import android.content.Context;
+import androidx.recyclerview.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
+
+import com.oozeetech.gdpapplication.R;
+import com.oozeetech.gdpapplication.pojo.MasterResponse;
+import com.oozeetech.gdpapplication.utils.Utils;
+import com.oozeetech.gdpapplication.widget.DTextView;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
+
+public class BusinessListFilterAdapter extends RecyclerView.Adapter<BusinessListFilterAdapter.Holder> implements Filterable {
+
+    public EventListener mEventListener;
+    private ValueFilter valueFilter;
+
+    Context context;
+    private List<MasterResponse.BusinessTypeList> data = new ArrayList<>();
+    private List<MasterResponse.BusinessTypeList> dummyData = new ArrayList<>();
+
+    public BusinessListFilterAdapter(Context context) {
+        this.context = context;
+    }
+
+    public void addAll(List<MasterResponse.BusinessTypeList> mData) {
+        data.clear();
+        dummyData.clear();
+        data.addAll(mData);
+        dummyData.addAll(mData);
+        notifyDataSetChanged();
+    }
+
+    public void clear() {
+        data.clear();
+        notifyDataSetChanged();
+    }
+
+    public boolean checkSize() {
+        if (data.size() == 0)
+            return true;
+        else
+            return false;
+    }
+
+    public void removeAt(int position) {
+        data.remove(position);
+        notifyDataSetChanged();
+    }
+
+    public MasterResponse.BusinessTypeList getItem(int position) {
+        return data.get(position);
+    }
+
+    @Override
+    public Holder onCreateViewHolder(ViewGroup parent, int viewType) {
+        final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        final View v = inflater.inflate(R.layout.item_master, parent, false);
+        return new Holder(v);
+    }
+
+    @Override
+    public void onBindViewHolder(final Holder holder, final int position) {
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mEventListener != null) {
+                    mEventListener.onClick(data.get(position));
+                }
+            }
+        });
+
+        holder.txtName.setText(Utils.bindView(data.get(position).getName()));
+
+    }
+
+    @Override
+    public int getItemCount() {
+        return data.size();
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    public EventListener getEventListener() {
+        return mEventListener;
+    }
+
+    public void setEventListener(EventListener eventListener) {
+        mEventListener = eventListener;
+    }
+
+
+    public interface EventListener {
+        void onClick(MasterResponse.BusinessTypeList position);
+    }
+
+
+    static class Holder extends RecyclerView.ViewHolder {
+        @BindView(R.id.txtName)
+        DTextView txtName;
+
+        Holder(View view) {
+            super(view);
+            ButterKnife.bind(this, view);
+        }
+
+    }
+
+    @Override
+    public Filter getFilter() {
+        if (valueFilter == null) {
+
+            valueFilter = new ValueFilter();
+        }
+        return valueFilter;
+    }
+
+    private class ValueFilter extends Filter {
+        //Invoked in a worker thread to filter the data according to the constraint.
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            FilterResults results = new FilterResults();
+
+                if (constraint != null && constraint.length() > 0) {
+
+                    ArrayList<MasterResponse.BusinessTypeList> filterList = new ArrayList<>();
+
+                    for (int i = 0; i < dummyData.size(); i++) {
+                        if ((dummyData.get(i).getName().toUpperCase())
+                                .contains(constraint.toString().toUpperCase())) {
+                            MasterResponse.BusinessTypeList data = dummyData.get(i);
+                            filterList.add(data);
+                        }
+                    }
+
+                    results.count = filterList.size();
+                    results.values = filterList;
+
+                } else {
+                    results.count = dummyData.size();
+                    results.values = dummyData;
+                }
+
+            return results;
+        }
+
+        //Invoked in the UI thread to publish the filtering results in the user interface.
+        @SuppressWarnings("unchecked")
+        @Override
+        protected void publishResults(CharSequence constraint,
+                                      FilterResults results) {
+
+            data = (ArrayList<MasterResponse.BusinessTypeList>) results.values;
+
+
+            notifyDataSetChanged();
+        }
+    }
+
+}
