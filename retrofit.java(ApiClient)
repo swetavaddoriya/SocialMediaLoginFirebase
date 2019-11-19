@@ -87,3 +87,61 @@ public class ApiClient {
 //    }
 
 }
+
+
+
+
+
+
+=========================================================RequestApi===================================================
+
+
+
+
+
+
+
+public interface RequestAPI {
+
+        @POST("/ChangePassword")
+        Call<ChangePasswordResponse> ChangePassword(@Body ChangePasswordRequest request);
+
+    @POST("/Login")
+    Call<LoginResponse> Login(@Body LoginRequest request);
+
+    @POST("/StockSearch")
+    Call<SearchDiamondResultResponse> StockSearch(@Body SearchDiamondResultRequest request);
+
+    @POST("/AddToFavourite")
+    Call<AddFavResponse> AddToFavourite(@Body AddFavRequest request);
+
+    @POST("/StoneDetail")
+    Call<StoneDetailsResponse> StoneDetail(@Body StoneDetailsRequest request);
+
+    @POST("/FavouriteList")
+    Call<FavListResponse> FavouriteList(@Body FavListRequest request);
+
+    @POST("/ContactUs")
+    Call<ContactUsResponse> ContactUs(@Body ContactUsRequest request);
+
+    @POST("/Register")
+    Call<CommonResponse> Register(@Body SignUpRequest request);
+
+    @POST("/ForgetPassword")
+    Call<CommonResponse> ForgetPassword(@Body ForgotPasswordRequest request);
+
+    @POST("/Master")
+    Call<MasterResponse> Master(@Body MasterRequest request);
+
+    @GET("/MasterJson/masterdataJson.txt")
+    Call<JsonObject> txtRead();
+
+//    @Multipart
+//    @POST("/AddTempImage")
+//    Call<CommonResponse> AddTempImage(@Part("APIKey") RequestBody APIKey, @Part("UserID") RequestBody UserID, @Part("ImageData\"; filename=\"ImageData.png\" ") RequestBody ImageData);
+
+
+}
+
+
+===============================================
