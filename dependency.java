@@ -45,3 +45,9 @@
 
     implementation 'org.jbundle.util.osgi.wrapped:org.jbundle.util.osgi.wrapped.org.apache.http.client:4.1.2'
     implementation 'com.squareup.picasso:picasso:2.5.2'
+      
+      =================
+      
+         classpath 'com.android.tools.build:gradle:3.3.2'
+        classpath 'com.google.gms:google-services:4.2.0'
+        classpath 'com.jakewharton:butterknife-gradle-plugin:10.1.0'
