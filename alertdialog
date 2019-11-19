@@ -1,0 +1,21 @@
+ AlertDialog dialog;
+ 
+ 
+ public void AlertDialogCopyMessage() {
+        android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(getActivity());
+        alertDialogBuilder
+                .setMessage("There is no text to copy")
+                .setCancelable(false)
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                })
+                .setNegativeButton("", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                    }
+                });
+        android.app.AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
+    }
